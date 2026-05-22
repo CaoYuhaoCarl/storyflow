@@ -4,9 +4,6 @@ from google.adk.workflow import node
 from google.genai import types
 from pydantic import BaseModel, Field
 
-APPROVAL_INTERRUPT_ID = "refund_approval"
-
-
 class RefundRequest(BaseModel):
     customer_id: str = Field(description="Customer ID, 'unknown' if not provided")
     amount_usd: float = Field(description="Amount in USD")
@@ -64,7 +61,6 @@ def process_refund(node_input: RefundDecision):
 @node(name="request_refund_approval", rerun_on_resume=False)
 async def request_refund_approval(node_input: RefundDecision):
     yield RequestInput(
-        interrupt_id=APPROVAL_INTERRUPT_ID,
         message=f"Large refund of ${node_input.amount_usd} requested. Approve? (yes/no)",
         payload=node_input.model_dump(mode="json"),
         response_schema=str,
