@@ -18,8 +18,8 @@ env/
 .env.*
 *.env
 *.env.*
-!.env.example
-!*.env.example
+!**/*_agent/.env.example
+/.env.example
 
 # ADK local runtime state
 .adk/
