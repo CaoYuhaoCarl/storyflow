@@ -35,3 +35,7 @@ env/
 *.log
 tmp/
 temp/
+
+# Essay grader local inputs and generated reports
+essay_grader/essays/
+essay_grader/reports/
