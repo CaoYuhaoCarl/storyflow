@@ -44,6 +44,49 @@ class EssayGraderAgentTest(unittest.TestCase):
             ),
         )
 
+    def test_language_score_deducts_half_point_per_error(self):
+        evidence = essay_agent.EssayEvidence(
+            student_name="Eve",
+            prompt_summary="Write about winter holiday plans.",
+            transcription="I learn writting. It help me. I like writters.",
+            required_points_covered=3,
+            required_points_total=3,
+            grammar_errors=["It help me"],
+            spelling_errors=["writting", "writters"],
+            has_clear_structure=True,
+            has_conclusion=True,
+            handwriting_legibility="clear",
+            strengths=["Covers all points."],
+            improvements=["Fix language errors."],
+        )
+
+        score = essay_agent._score_from_evidence(evidence)
+
+        self.assertEqual(score.language, 3.5)
+
+    def test_overall_score_sums_dimension_scores(self):
+        examples = [
+            essay_agent.DimensionScores(
+                content=5,
+                structure=5,
+                language=2.5,
+                handwriting=4,
+            ),
+            essay_agent.DimensionScores(
+                content=4,
+                structure=5,
+                language=3.5,
+                handwriting=4,
+            ),
+        ]
+
+        for dimensions in examples:
+            with self.subTest(dimensions=dimensions):
+                self.assertEqual(
+                    essay_agent._calculate_overall_score(dimensions),
+                    16.5,
+                )
+
     def test_grade_one_sets_filename_and_calculates_overall_score(self):
         async def run_grade_one():
             with tempfile.TemporaryDirectory() as tmpdir:
@@ -101,7 +144,7 @@ class EssayGraderAgentTest(unittest.TestCase):
                 handwriting=4,
             ),
         )
-        self.assertEqual(grade.overall_score, 16)
+        self.assertEqual(grade.overall_score, 16.0)
 
 
 if __name__ == "__main__":

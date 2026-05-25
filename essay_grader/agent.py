@@ -50,7 +50,7 @@ MIME_BY_SUFFIX = {
 class DimensionScores(BaseModel):
   content: int
   structure: int
-  language: int
+  language: float
   handwriting: int
 
 
@@ -80,7 +80,7 @@ class EssayGrade(BaseModel):
   student_name: str
   prompt_summary: str
   transcription: str
-  overall_score: int
+  overall_score: float
   dimensions: DimensionScores
   strengths: list[str]
   improvements: list[str]
@@ -143,14 +143,14 @@ def list_essays(node_input: str) -> list[dict[str, str]]:
   return items
 
 
-def _calculate_overall_score(dimensions: DimensionScores) -> int:
-  weighted = (
-      dimensions.content * 4
-      + dimensions.structure * 4
-      + dimensions.language * 6
-      + dimensions.handwriting * 6
-  ) / 5
-  return round(weighted)
+def _calculate_overall_score(dimensions: DimensionScores) -> float:
+  total = (
+      dimensions.content
+      + dimensions.structure
+      + dimensions.language
+      + dimensions.handwriting
+  )
+  return round(total, 1)
 
 
 def _score_from_evidence(evidence: EssayEvidence) -> DimensionScores:
@@ -179,16 +179,7 @@ def _score_from_evidence(evidence: EssayEvidence) -> DimensionScores:
   language_error_count = (
       len(evidence.grammar_errors) + len(evidence.spelling_errors)
   )
-  if language_error_count == 0:
-    language = 5
-  elif language_error_count <= 2:
-    language = 4
-  elif language_error_count <= 5:
-    language = 3
-  elif language_error_count <= 8:
-    language = 2
-  else:
-    language = 1
+  language = max(0.0, 5 - language_error_count * 0.5)
 
   handwriting = {
       "excellent": 5,
@@ -310,8 +301,8 @@ def write_report(node_input: list[EssayGrade]):
     for g in student_grades:
       d = g.dimensions
       lines.append(
-          f"| {g.filename} | {g.overall_score} | {d.content} |"
-          f" {d.structure} | {d.language} | {d.handwriting} |"
+          f"| {g.filename} | {g.overall_score:.1f} | {d.content} |"
+          f" {d.structure} | {d.language:.1f} | {d.handwriting} |"
       )
     lines.append("")
     lines.append("## Detailed Feedback")
@@ -319,7 +310,7 @@ def write_report(node_input: list[EssayGrade]):
       lines.append("")
       lines.append(f"### {g.filename}")
       lines.append(f"**Prompt:** {g.prompt_summary}")
-      lines.append(f"**Overall:** {g.overall_score}/20")
+      lines.append(f"**Overall:** {g.overall_score:.1f}/20")
       lines.append("**Strengths:**")
       for s in g.strengths:
         lines.append(f"- {s}")
