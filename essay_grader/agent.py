@@ -78,7 +78,7 @@ grader = Agent(
         "  structure   - coherence and organization\n"
         "  language    - accuracy and fluency\n"
         "  handwriting - legibility and presentation\n\n"
-        "overall_score is 0-20, weighted 8/5/5/2 across content / structure"
+        "overall_score is 0-20, weighted 4/4/6/6 across content / structure"
         " / language / handwriting, rounded to the nearest integer.\n\n"
         "student_name: the student's name as written on the image, usually at"
         " the top of the page or in a header/label area. Return only the name"
