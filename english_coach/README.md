@@ -1,11 +1,11 @@
 # english-coach
 
-ADK v2 workflow for English coaching feedback. The current workflow grades
-handwritten writing submissions. Drop `.jpg`, `.jpeg`, or `.png` files into
-`./input/` (each image shows the printed prompt above the student's
-handwritten response), then start the workflow and send any chat message. The
-coach fans out one Gemini call per image in parallel, returns structured
-`EnglishCoachFeedback` results, and writes markdown reports to `./reports/`.
+ADK v2 workflow for English coaching feedback. Drop `.jpg`, `.jpeg`, `.png`,
+`.webp`, `.heic`, or `.heif` files into `./input/`. The workflow classifies
+each screenshot as writing feedback, grammar training, or unsupported, then
+routes it to the matching structured extractor. It writes per-student Markdown
+reports to `./reports/` and machine-readable personalized training inputs to
+`./training_inputs/`.
 
 Usage: from the *parent* directory of this folder, run `adk web` and pick
 `english_coach` in the app dropdown. (`adk web` discovers apps as subdirectories
